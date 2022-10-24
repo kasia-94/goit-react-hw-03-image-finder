@@ -4,6 +4,8 @@ import { SearchBar } from './SearchBar/SearchBar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { fetchPhoto } from 'components/fetchPhoto';
 import { Modal } from './Modal/Modal';
+import { Loader } from './Loader/Loader';
+import { Button } from './Button/Button';
 
 export class App extends Component {
   state = {
@@ -12,31 +14,15 @@ export class App extends Component {
     page: 1,
     largeImage: '',
     showModal: false,
+    isLoading: false,
   };
-
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (
-  //     prevState.page !== this.state.page ||
-  //     prevState.name !== this.state.name
-  //   ) {
-  //     try {
-  //       const response = fetchPhoto(this.state.page, this.state.name);
-
-  //       this.setState(prevState => ({
-  //         gallery: [...prevState.gallery, ...response],
-  //       }));
-  //     } catch (error) {
-  //       this.setState({ error });
-  //     }
-  //   }
-  // }
-
   componentDidUpdate(prevProps, prevState) {
     const prevPage = prevState.page;
-    const prevSearchData = prevState.name;
+    const prevSearchName = prevState.name;
     const { name, page, gallery } = this.state;
-    if (prevPage !== page || prevSearchData !== name) {
+    if (prevPage !== page || prevSearchName !== name) {
       try {
+        this.setState({ isLoading: true });
         const response = fetchPhoto(name, page);
         response.then(data => {
           data.data.hits.length === 0
@@ -47,18 +33,16 @@ export class App extends Component {
                     gallery: [...gallery, { id, webformatURL, largeImageURL }],
                   }));
               });
+          this.setState({ isLoading: false });
         });
       } catch (error) {
-        this.setState({ error });
+        this.setState({ error, isLoading: false });
       } finally {
       }
     }
   }
 
   onSubmit = name => {
-    if (name.trim() === '') {
-      return alert('Please, I need to know what you are looking for!');
-    }
     this.setState({ name: name, gallery: [] });
   };
 
@@ -73,22 +57,24 @@ export class App extends Component {
     }));
   };
 
+  nextPage = () => {
+    this.setState(({ page }) => ({ page: page + 1 }));
+  };
+
   render() {
+    const { onSubmit, openModal, toggleModal, nextPage } = this;
+    const { gallery, showModal, largeImage, isLoading } = this.state;
     return (
       <AppMain>
-        <SearchBar onSubmit={this.onSubmit} />
-        {this.state.gallery.length !== 0 && (
-          <ImageGallery
-            gallery={this.state.gallery}
-            openModal={this.openModal}
-          />
+        <SearchBar onSubmit={onSubmit} />
+        {gallery.length !== 0 && (
+          <ImageGallery gallery={gallery} openModal={openModal} />
         )}
-        {this.state.showModal && (
-          <Modal
-            toggleModal={this.toggleModal}
-            largeImage={this.state.largeImage}
-          />
+        {showModal && (
+          <Modal toggleModal={toggleModal} largeImage={largeImage} />
         )}
+        {isLoading && <Loader />}
+        {gallery.length >= 12 && <Button nextPage={nextPage} />}
       </AppMain>
     );
   }

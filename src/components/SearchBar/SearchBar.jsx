@@ -16,6 +16,9 @@ export class SearchBar extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
+    if (this.state.inputName.trim() === '') {
+      return alert('Please, I need to know what you are looking for!');
+    }
     this.props.onSubmit(this.state.inputName);
     this.setState({ inputName: '' });
   };
