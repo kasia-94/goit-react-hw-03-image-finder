@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { createPortal } from 'react-dom';
 import { Overlay, ModalWindow } from './Modal.styled';
 
@@ -15,22 +16,29 @@ export class Modal extends Component {
 
   handleKeyDown = e => {
     if (e.code === 'Escape') {
-      this.props.onClose();
+      this.props.toggleModal();
     }
   };
 
   handleBackdropClick = e => {
     if (e.currentTarget === e.target) {
-      this.props.onClose();
+      this.props.toggleModal();
     }
   };
 
   render() {
     return createPortal(
       <Overlay onClick={this.handleBackdropClick}>
-        <ModalWindow>{this.props.children}</ModalWindow>
+        <ModalWindow>
+          <img src={this.props.largeImage} alt="" />
+        </ModalWindow>
       </Overlay>,
       modalRoot
     );
   }
 }
+
+Modal.propTypes = {
+  toggleModal: PropTypes.func.isRequired,
+  largeImageURL: PropTypes.string.isRequired,
+};
