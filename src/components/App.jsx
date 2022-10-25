@@ -79,8 +79,6 @@ export class App extends Component {
     return (
       <AppMain>
         <SearchBar onSubmit={onSubmit} />
-        {error &&
-          alert(`Sorry, but something happened wrong: ${error.message}`)}
         {gallery.length !== 0 && (
           <ImageGallery gallery={gallery} openModal={openModal} />
         )}
