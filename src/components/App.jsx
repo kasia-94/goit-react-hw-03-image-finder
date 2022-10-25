@@ -75,10 +75,12 @@ export class App extends Component {
 
   render() {
     const { onSubmit, openModal, toggleModal, nextPage } = this;
-    const { gallery, showModal, isLoading } = this.state;
+    const { gallery, showModal, isLoading, error } = this.state;
     return (
       <AppMain>
         <SearchBar onSubmit={onSubmit} />
+        {error &&
+          alert(`Sorry, but something happened wrong: ${error.message}`)}
         {gallery.length !== 0 && (
           <ImageGallery gallery={gallery} openModal={openModal} />
         )}
