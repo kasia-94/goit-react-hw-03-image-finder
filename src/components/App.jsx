@@ -14,11 +14,12 @@ export class App extends Component {
     page: 1,
     showModal: false,
     isLoading: false,
+    error: null,
   };
   componentDidUpdate(prevProps, prevState) {
     const prevPage = prevState.page;
     const prevSearchName = prevState.name;
-    const { name, page, gallery } = this.state;
+    const { name, page } = this.state;
 
     if (prevPage !== page || prevSearchName !== name) {
       try {
@@ -74,10 +75,12 @@ export class App extends Component {
 
   render() {
     const { onSubmit, openModal, toggleModal, nextPage } = this;
-    const { gallery, showModal, largeImageURL, isLoading } = this.state;
+    const { gallery, showModal, isLoading } = this.state;
     return (
       <AppMain>
         <SearchBar onSubmit={onSubmit} />
+        {error &&
+          alert(`Sorry, but something happened wrong: ${error.message}`)}
         {gallery.length !== 0 && (
           <ImageGallery gallery={gallery} openModal={openModal} />
         )}
