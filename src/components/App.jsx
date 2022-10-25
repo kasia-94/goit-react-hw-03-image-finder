@@ -39,13 +39,6 @@ export class App extends Component {
             })
           );
 
-          // data.data.hits.forEach(({ id, webformatURL, largeImageURL }) => {
-          //   !gallery.some(image => image.id === id) &&
-          //     this.setState(({ gallery }) => ({
-          //       gallery: [...gallery, { id, webformatURL, largeImageURL }],
-          //     }));
-          // });
-
           this.setState({
             gallery: [...this.state.gallery, ...renderPhoto],
             isLoading: false,
