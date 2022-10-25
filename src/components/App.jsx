@@ -12,7 +12,6 @@ export class App extends Component {
     name: '',
     gallery: [],
     page: 1,
-    largeImage: '',
     showModal: false,
     isLoading: false,
   };
@@ -20,41 +19,60 @@ export class App extends Component {
     const prevPage = prevState.page;
     const prevSearchName = prevState.name;
     const { name, page, gallery } = this.state;
+
     if (prevPage !== page || prevSearchName !== name) {
       try {
         this.setState({ isLoading: true });
+
         const response = fetchPhoto(name, page);
         response.then(data => {
-          data.data.hits.length === 0
-            ? alert('Nothing found')
-            : data.data.hits.forEach(({ id, webformatURL, largeImageURL }) => {
-                !gallery.some(image => image.id === id) &&
-                  this.setState(({ gallery }) => ({
-                    gallery: [...gallery, { id, webformatURL, largeImageURL }],
-                  }));
-              });
-          this.setState({ isLoading: false });
+          if (!data.data.hits.length) {
+            return alert('Nothing found');
+          }
+
+          const renderPhoto = data.data.hits.map(
+            ({ id, webformatURL, largeImageURL, tags }) => ({
+              id,
+              webformatURL,
+              largeImageURL,
+              tags,
+            })
+          );
+
+          // data.data.hits.forEach(({ id, webformatURL, largeImageURL }) => {
+          //   !gallery.some(image => image.id === id) &&
+          //     this.setState(({ gallery }) => ({
+          //       gallery: [...gallery, { id, webformatURL, largeImageURL }],
+          //     }));
+          // });
+
+          this.setState({
+            gallery: [...this.state.gallery, ...renderPhoto],
+            isLoading: false,
+          });
         });
       } catch (error) {
         this.setState({ error, isLoading: false });
-      } finally {
       }
     }
   }
 
   onSubmit = name => {
-    this.setState({ name: name, gallery: [] });
+    this.setState({ name: name, gallery: [], page: 1 });
   };
 
   toggleModal = () => {
     this.setState(({ showModal }) => ({ showModal: !showModal }));
   };
 
-  openModal = index => {
-    this.setState(({ gallery }) => ({
-      showModal: true,
-      largeImage: gallery[index].largeImageURL,
-    }));
+  openModal = id => {
+    const photo = this.state.gallery.find(photo => photo.id === id);
+    this.setState({
+      showModal: {
+        largeImageURL: photo.largeImageURL,
+        tags: photo.tags,
+      },
+    });
   };
 
   nextPage = () => {
@@ -63,7 +81,7 @@ export class App extends Component {
 
   render() {
     const { onSubmit, openModal, toggleModal, nextPage } = this;
-    const { gallery, showModal, largeImage, isLoading } = this.state;
+    const { gallery, showModal, largeImageURL, isLoading } = this.state;
     return (
       <AppMain>
         <SearchBar onSubmit={onSubmit} />
@@ -71,7 +89,11 @@ export class App extends Component {
           <ImageGallery gallery={gallery} openModal={openModal} />
         )}
         {showModal && (
-          <Modal toggleModal={toggleModal} largeImage={largeImage} />
+          <Modal
+            toggleModal={toggleModal}
+            largeImageURL={showModal.largeImageURL}
+            tags={showModal.tags}
+          />
         )}
         {isLoading && <Loader />}
         {gallery.length >= 12 && <Button nextPage={nextPage} />}

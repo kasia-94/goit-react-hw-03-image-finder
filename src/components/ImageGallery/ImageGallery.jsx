@@ -5,12 +5,12 @@ import { Gallery } from './ImageGallery.styled';
 
 export const ImageGallery = ({ gallery, openModal }) => (
   <Gallery>
-    {gallery.map(({ id, webformatURL }, index) => (
+    {gallery.map(({ id, webformatURL, tags }) => (
       <ImageGalleryItem
         key={id}
         webformatURL={webformatURL}
-        index={index}
-        openModal={openModal}
+        tags={tags}
+        openModal={() => openModal(id)}
       ></ImageGalleryItem>
     ))}
   </Gallery>
@@ -21,6 +21,7 @@ ImageGallery.propTypes = {
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       webformatURL: PropTypes.string.isRequired,
+      tags: PropTypes.string.isRequired,
     })
   ),
   openModal: PropTypes.func.isRequired,
