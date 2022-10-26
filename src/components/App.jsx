@@ -12,7 +12,7 @@ export class App extends Component {
     name: '',
     gallery: [],
     page: 1,
-    showModal: false,
+    showModal: null,
     isLoading: false,
     error: null,
   };
